@@ -1,0 +1,66 @@
+# WiiUSharp
+
+.NET libraries for Wii U file formats and title concepts. No native dependencies, no keys, no Nintendo assets.
+
+Not affiliated with or endorsed by Nintendo. Wii U is a trademark of Nintendo.
+
+## Packages
+
+| Package | Targets | Purpose |
+|---|---|---|
+| `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation: `TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, and the `ImageSlot` / `BootSound` formats a title ships with. |
+| `WiiUSharp.Nfs` | net48, net6.0, net8.0, net10.0 | The vWii disc container (`content/hif_*.nfs`): header, sparse part table, per-sector AES, 250 MB split. |
+
+```
+dotnet add package WiiUSharp
+dotnet add package WiiUSharp.Nfs
+```
+
+## Usage
+
+### Title metadata
+
+```csharp
+using WiiUSharp;
+
+var game = new Game(
+    new TitleId(TitleType.Demo, 0x12345678),
+    new GroupId(0x5678),
+    new ProductCode(ProductCode.EShop, "FAAE"))
+{
+    Region = Region.All,
+    Names = LocalizedName.ForAllLanguages(new LocalizedName("Super Metroid")),
+};
+
+string id = game.TitleId.ToString();            // "0005000212345678"
+ImageSlot icon = ImageSlot.Icon;                // iconTex.tga, 128x128, 32 bpp
+```
+
+### NFS container
+
+```csharp
+using WiiUSharp.Nfs;
+
+var key = NfsKey.FromFile(@"title\code\htk.bin");
+
+// read: a seekable stream of the decrypted payload, no temp file
+using Stream payload = NfsReader.Open(@"title\content", key).OpenPayload();
+
+// write: pack, encrypt and split in one pass
+new NfsWriter(key).Write(payload, new DiscDataSpan(0xF800000, gameLength), @"out\content");
+```
+
+The payload is a Wii disc image with its game partitions decrypted. Converting to or from a normal ISO needs Wii partition crypto, which `WiiUSharp.Nfs` does not implement — supply an `IPartitionCipher` and use `NfsConverter`. See [.docs/WiiUSharp.Nfs.md](.docs/WiiUSharp.Nfs.md).
+
+## Building
+
+```
+dotnet build WiiUSharp.sln
+dotnet test WiiUSharp.sln
+```
+
+Requires the .NET 10 SDK (`global.json`). `dotnet build -c Release` also produces the NuGet packages.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
