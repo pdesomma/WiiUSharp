@@ -1,6 +1,6 @@
 # WiiUSharp
 
-.NET libraries for Wii U file formats and title concepts. No native dependencies, no keys, no Nintendo assets.
+.NET libraries for Wii U file formats and title concepts.
 
 Not affiliated with or endorsed by Nintendo. Wii U is a trademark of Nintendo.
 
