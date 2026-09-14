@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-14
+
+### Added
+- `WiiUSharp.Imaging`: `TitleImage` loads PNG/JPEG/BMP/WebP/TGA, resizes to an `ImageSlot` and writes uncompressed footer-less TGA at the slot's depth; `Problems`/`Verify` check an existing TGA. SkiaSharp + TargaSharp core, no System.Drawing.
+
 ## [0.2.0] - 2026-09-14
 
 ### Added

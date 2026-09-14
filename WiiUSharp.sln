@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUSharp.Tests", ".tests\W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUSharp.Nfs.Tests", ".tests\WiiUSharp.Nfs.Tests\WiiUSharp.Nfs.Tests.csproj", "{0CF258F9-6789-4715-AA09-766CA0BCC49B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUSharp.Imaging", "WiiUSharp.Imaging\WiiUSharp.Imaging.csproj", "{5472D676-E243-4633-B6BA-67142F25AE8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUSharp.Imaging.Tests", ".tests\WiiUSharp.Imaging.Tests\WiiUSharp.Imaging.Tests.csproj", "{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,30 @@ Global
 		{0CF258F9-6789-4715-AA09-766CA0BCC49B}.Release|x64.Build.0 = Release|Any CPU
 		{0CF258F9-6789-4715-AA09-766CA0BCC49B}.Release|x86.ActiveCfg = Release|Any CPU
 		{0CF258F9-6789-4715-AA09-766CA0BCC49B}.Release|x86.Build.0 = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|x64.Build.0 = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Debug|x86.Build.0 = Debug|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|x64.ActiveCfg = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|x64.Build.0 = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|x86.ActiveCfg = Release|Any CPU
+		{5472D676-E243-4633-B6BA-67142F25AE8A}.Release|x86.Build.0 = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|x64.Build.0 = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +106,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5E30EDAD-E446-4111-A8BA-9CB4471AFED5} = {9CBE8BDF-E2D4-CFB6-4D71-B203AD5191F7}
 		{0CF258F9-6789-4715-AA09-766CA0BCC49B} = {9CBE8BDF-E2D4-CFB6-4D71-B203AD5191F7}
+		{CBF9DFEB-DF8A-4120-9BEA-703405E1D5C9} = {9CBE8BDF-E2D4-CFB6-4D71-B203AD5191F7}
 	EndGlobalSection
 EndGlobal

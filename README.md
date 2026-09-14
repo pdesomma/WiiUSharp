@@ -12,10 +12,12 @@ The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FI
 |---|---|---|
 | `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation: `TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, and the `ImageSlot` / `BootSound` formats a title ships with. |
 | `WiiUSharp.Nfs` | net48, net6.0, net8.0, net10.0 | The vWii disc container (`content/hif_*.nfs`): header, sparse part table, per-sector AES, 250 MB split. |
+| `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
 
 ```
 dotnet add package WiiUSharp
 dotnet add package WiiUSharp.Nfs
+dotnet add package WiiUSharp.Imaging
 ```
 
 ## Usage
@@ -36,6 +38,16 @@ var game = new Game(
 
 string id = game.TitleId.ToString();            // "0005000212345678"
 ImageSlot icon = ImageSlot.Icon;                // iconTex.tga, 128x128, 32 bpp
+```
+
+### Title images
+
+```csharp
+using WiiUSharp.Imaging;
+
+TitleImage.Convert("icon.png", ImageSlot.Icon, @"title\meta\iconTex.tga");   // resized to 128x128, 32 bpp, uncompressed, no footer
+
+var problems = TitleImage.Problems(new TgaFile("bootTvTex.tga"), ImageSlot.BootTv);   // empty when it fits
 ```
 
 ### NFS container
