@@ -5,7 +5,6 @@
     <Title>WiiUSharp.Nfs</Title>
     <Description>Reads and writes the Wii U vWii disc container (hif_*.nfs): EGGS header, sparse part table, per-sector AES and the 250 MB split.</Description>
     <PackageReleaseNotes>0.1.0: initial release.</PackageReleaseNotes>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

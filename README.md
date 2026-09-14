@@ -4,6 +4,8 @@
 
 Not affiliated with or endorsed by Nintendo. Wii U is a trademark of Nintendo.
 
+The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) by sabykos, piratesephiroth and FIX94. `WiiUSharp.Nfs` is a new implementation of that format, not a port of their code.
+
 ## Packages
 
 | Package | Targets | Purpose |
@@ -59,7 +61,7 @@ dotnet build WiiUSharp.sln
 dotnet test WiiUSharp.sln
 ```
 
-Requires the .NET 10 SDK (`global.json`). `dotnet build -c Release` also produces the NuGet packages.
+Requires the .NET 10 SDK (`global.json`). `dotnet pack -c Release` produces the NuGet packages.
 
 ## License
 

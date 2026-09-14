@@ -65,4 +65,4 @@ Synthetic only — no Nintendo fixtures. Header byte-for-byte against the tool's
 
 ## Source
 
-FIX94/nfs2iso2nfs `Program.cs`: `packNFS`, `unpackNFS`, `EnDecryptNFS`, `manipulateISO`, `splitNFSFile`, `combineNFSFiles`.
+Format facts come from reading [FIX94/nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) `Program.cs` (`packNFS`, `unpackNFS`, `EnDecryptNFS`, `manipulateISO`, `splitNFSFile`, `combineNFSFiles`) by sabykos, piratesephiroth and FIX94. That project carries no license; nothing here is copied from it.
