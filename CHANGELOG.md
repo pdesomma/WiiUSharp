@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-14
+
+### Added
+- `WiiUSharp.Rpx`: `RpxFile` reads RPX/RPL executables with every section plain, lets section bytes be replaced, and saves plain or zlib-compressed with the per-section CRC table rebuilt. Replaces wiiurpxtool.
+
 ## [0.5.0] - 2026-09-14
 
 ### Added

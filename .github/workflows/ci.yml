@@ -55,6 +55,7 @@ jobs:
           dotnet pack WiiUSharp.Imaging/WiiUSharp.Imaging.csproj --configuration Release --output nupkg
           dotnet pack WiiUSharp.Audio/WiiUSharp.Audio.csproj --configuration Release --output nupkg
           dotnet pack WiiUSharp.Nus/WiiUSharp.Nus.csproj --configuration Release --output nupkg
+          dotnet pack WiiUSharp.Rpx/WiiUSharp.Rpx.csproj --configuration Release --output nupkg
 
       - name: Upload packages
         uses: actions/upload-artifact@v4

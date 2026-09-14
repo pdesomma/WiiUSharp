@@ -4,7 +4,7 @@
 
 Not affiliated with or endorsed by Nintendo. Wii U is a trademark of Nintendo.
 
-The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) by sabykos, piratesephiroth and FIX94, and the NUS package layout from [NUSPacker](https://github.com/ihaveamac/NUSPacker) by Maschell (timogus). `WiiUSharp.Nfs` and `WiiUSharp.Nus` are new implementations of those formats, not ports of their code.
+The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) by sabykos, piratesephiroth and FIX94, the NUS package layout from [NUSPacker](https://github.com/ihaveamac/NUSPacker) by Maschell (timogus), and RPX compression from [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) by CBH. `WiiUSharp.Nfs`, `WiiUSharp.Nus` and `WiiUSharp.Rpx` are new implementations of those formats, not ports of their code.
 
 No keys ship with these packages. The common key, title keys and `htk.bin` are yours to supply.
 
@@ -17,6 +17,7 @@ No keys ship with these packages. The common key, title keys and `htk.bin` are y
 | `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
 | `WiiUSharp.Audio` | net48, net6.0, net8.0, net10.0 | Turns WAV, MP3 or AIFF into `bootSound.btsnd`: 48 kHz stereo 16-bit, six seconds. NAudio.Core + NLayer; no Windows codecs. |
 | `WiiUSharp.Nus` | net48, net6.0, net8.0, net10.0 | Packs a `code`/`content`/`meta` folder into an installable title: FST, hashed and plain contents, fake-signed TMD and ticket. |
+| `WiiUSharp.Rpx` | net48, net6.0, net8.0, net10.0 | RPX/RPL executables: load with every section plain, replace section bytes, save compressed or not with the CRC table rebuilt. |
 
 ```
 dotnet add package WiiUSharp
@@ -24,6 +25,7 @@ dotnet add package WiiUSharp.Nfs
 dotnet add package WiiUSharp.Imaging
 dotnet add package WiiUSharp.Audio
 dotnet add package WiiUSharp.Nus
+dotnet add package WiiUSharp.Rpx
 ```
 
 ## Usage
@@ -93,6 +95,19 @@ NusPackage package = packer.Pack(@"title", @"out", TitleKey.Parse("1337133713371
 ```
 
 Title values come from `code/app.xml`; pass a `TitleInfo` to override them, your own `ContentRule` list to change which files share a content, or a real `title.cert` to replace the generated stub. Output is fake-signed and installs with the usual signature patches. See [.docs/WiiUSharp.Nus.md](.docs/WiiUSharp.Nus.md).
+
+### Executables
+
+```csharp
+using WiiUSharp.Rpx;
+
+RpxFile rpx = RpxFile.Load(@"title\code\WUP-JAAE.rpx");   // compressed sections are inflated on load
+Section rodata = rpx.FindSection(".rodata")!;
+rodata.Data = Patched(rodata.Data);                        // any byte change, any length
+rpx.Save(@"title\code\WUP-JAAE.rpx", compress: true);     // CRC table rebuilt, layout as wiiurpxtool writes it
+```
+
+See [.docs/WiiUSharp.Rpx.md](.docs/WiiUSharp.Rpx.md).
 
 ## Building
 
