@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-14
+
+### Added
+- `WiiUSharp.Nus`: `NusPacker` turns a code/content/meta folder into an installable title: content rules, FST, H0-H3 hashed contents, plain contents, fake-signed TMD and ticket, stub certificate chain. A fresh implementation of the layout NUSPacker produces; no keys or certificates ship in the package.
+
 ## [0.4.0] - 2026-09-14
 
 ### Added

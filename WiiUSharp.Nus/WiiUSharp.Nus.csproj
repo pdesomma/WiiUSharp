@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>0.5.0</Version>
+    <Title>WiiUSharp.Nus</Title>
+    <Description>Packs an unpacked Wii U title (code, content, meta) into the installable NUS layout: FST, hashed and plain contents, fake-signed TMD and ticket.</Description>
+    <PackageReleaseNotes>0.5.0: initial release.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="WiiUSharp.Nus.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WiiUSharp\WiiUSharp.csproj" />
+  </ItemGroup>
+
+</Project>

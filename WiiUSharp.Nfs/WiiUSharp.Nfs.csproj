@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
     <Title>WiiUSharp.Nfs</Title>
     <Description>Reads and writes the Wii U vWii disc container (hif_*.nfs): EGGS header, sparse part table, per-sector AES and the 250 MB split.</Description>
-    <PackageReleaseNotes>0.4.0: version aligned; no changes.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.5.0: version aligned; no changes.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
