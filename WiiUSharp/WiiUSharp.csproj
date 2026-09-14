@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Title>WiiUSharp</Title>
     <Description>.NET library for Wii U title concepts: title IDs, product codes, regions, per-language names, and the image and boot-sound formats a title ships with.</Description>
-    <PackageReleaseNotes>0.1.0: initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.1.1: README update; no code changes.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
