@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-14
+
+### Added
+- `WiiUSharp.Nus`: `NusDownloader` fetches a title's TMD, ticket, contents and H3 tables from the update server, builds a fake ticket from a wrapped title key when the server has none, resumes finished files, and can check content 0 against the FST magic before fetching the rest. `NusUnpacker` decrypts a package back into code/content/meta with every H0–H3 and plain-content hash verified. `Tmd.Parse`, `Ticket.Parse`, `Fst.Parse`, `ContentRecord.Parse`, `EncryptedTitleKey`, `TitleKey.Encrypt`, `ContentRecord.Id` and `EncryptedSize`. Replaces NUS downloaders and CDecrypt; no keys ship.
+
 ## [0.6.0] - 2026-09-14
 
 ### Added

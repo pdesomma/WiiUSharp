@@ -52,4 +52,47 @@ public class TicketTests
         CollectionAssert.AreEqual(Reference.TitleKey.ToArray(), Reference.AesCbc(Reference.CommonKey.ToArray(), iv, encrypted, encrypt: false));
         CollectionAssert.AreEqual(encrypted, Reference.Slice(ticket, Ticket.EncryptedTitleKeyOffset, 16));
     }
+
+    [TestMethod]
+    public void Parse_BuiltTicket_ReturnsTitleIdAndWrappedKey()
+    {
+        var info = Ticket.Parse(Ticket.Build(Reference.TitleId, Reference.TitleKey, Reference.CommonKey));
+
+        Assert.AreEqual(Reference.TitleId, info.TitleId);
+        Assert.AreEqual(Reference.TitleKey.Encrypt(Reference.TitleId, Reference.CommonKey), info.TitleKey);
+        Assert.AreEqual(Reference.TitleKey, info.TitleKey.Decrypt(Reference.TitleId, Reference.CommonKey));
+        Assert.ThrowsExactly<InvalidDataException>(() => Ticket.Parse(new byte[0x100]));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Ticket.Parse(null!));
+    }
+
+    [TestMethod]
+    public void Build_WrappedKey_MatchesBuildFromPlainKey()
+    {
+        var wrapped = Reference.TitleKey.Encrypt(Reference.TitleId, Reference.CommonKey);
+
+        var ticket = Ticket.Build(Reference.TitleId, wrapped);
+
+        Assert.AreEqual(NusFormat.TicketSize, ticket.Length);
+        CollectionAssert.AreEqual(wrapped.ToArray(), Reference.Slice(ticket, Ticket.EncryptedTitleKeyOffset, 16));
+        Assert.AreEqual(Reference.TitleId.Value, Reference.ReadUInt64(ticket, Ticket.TitleIdOffset));
+        var fromPlain = Ticket.Build(Reference.TitleId, Reference.TitleKey, Reference.CommonKey);
+        CollectionAssert.AreEqual(Reference.Slice(fromPlain, 0x140, 0x92), Reference.Slice(ticket, 0x140, 0x92));
+        CollectionAssert.AreEqual(Reference.Slice(fromPlain, 0x1D8, 0x178), Reference.Slice(ticket, 0x1D8, 0x178));
+    }
+
+    [TestMethod]
+    public void EncryptedTitleKey_ParseAndHex_RoundTrip()
+    {
+        var key = EncryptedTitleKey.Parse("00112233445566778899AABBCCDDEEFF");
+
+        Assert.AreEqual("00112233445566778899aabbccddeeff", key.ToString());
+        Assert.AreEqual(key, new EncryptedTitleKey(key.ToArray()));
+        Assert.IsTrue(key != default);
+        Assert.AreEqual("00000000000000000000000000000000", default(EncryptedTitleKey).ToString());
+        Assert.AreEqual(Reference.TitleKey.ToString(), string.Concat(Reference.TitleKey.ToArray().Select(b => b.ToString("x2"))));
+        Assert.AreEqual(Reference.CommonKey.ToString(), string.Concat(Reference.CommonKey.ToArray().Select(b => b.ToString("x2"))));
+        Assert.ThrowsExactly<FormatException>(() => EncryptedTitleKey.Parse("abc"));
+        Assert.ThrowsExactly<ArgumentException>(() => new EncryptedTitleKey(new byte[3]));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new EncryptedTitleKey(null!));
+    }
 }

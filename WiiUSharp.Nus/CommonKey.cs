@@ -46,4 +46,9 @@ public readonly struct CommonKey : IEquatable<CommonKey>
     /// Copy of the key bytes.
     /// </summary>
     public byte[] ToArray() => (byte[])(_bytes ?? new byte[NusFormat.KeySize]).Clone();
+
+    /// <summary>
+    /// Key as lowercase hex.
+    /// </summary>
+    public override string ToString() => KeyBytes.ToHex(ToArray());
 }

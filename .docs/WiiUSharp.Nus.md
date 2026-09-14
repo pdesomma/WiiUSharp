@@ -1,6 +1,6 @@
 # WiiUSharp.Nus
 
-Packs an unpacked title (`code/`, `content/`, `meta/`) into the installable NUS layout, replacing NUSPacker / CNUSPACKER.
+Packs an unpacked title (`code/`, `content/`, `meta/`) into the installable NUS layout, replacing NUSPacker / CNUSPACKER; downloads a title's package from the update server and unpacks it again, replacing NUS downloaders / CDecrypt.
 
 Output: `title.tmd`, `title.tik`, `title.cert`, one `{index:X8}.app` per content and a `{index:X8}.h3` for each hashed content. Everything is fake-signed; installing needs signature patches, as it always has.
 
@@ -150,6 +150,27 @@ NUSPacker's stub carries no key material, only names, so it is safe to generate:
 ```
 Names are zero-padded to 16 bytes; everything else is zero. A caller can pass a real chain instead.
 
+## Downloading
+
+`NusDownloader` fetches from `http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/<title id, lowercase hex>/`:
+
+| File | URL | Written as |
+|---|---|---|
+| TMD | `tmd` | `title.tmd` |
+| Ticket | `cetk` | `title.tik` — retail games have none (404); a fake ticket is built from the caller's wrapped title key instead |
+| Content | `<content id, X8>` | `<content id, X8>.app` |
+| H3 table | `<content id, X8>.h3` | same; hashed contents only |
+
+The TMD comes with its certificate chain appended; `Tmd.Parse` ignores the extra bytes. Files already on disk at the expected length are not fetched again. When the common key is supplied, content 0 is decrypted as soon as it lands and must start with the FST magic; otherwise the download stops with `InvalidDataException` before the large contents are touched. No key of any kind is needed to download.
+
+## Unpacking
+
+`NusUnpacker` is the inverse of packing: the ticket's wrapped title key is unwrapped with the common key (or a plain title key is given), content 0 is decrypted and parsed as the FST, then each content is decrypted once, forward-only, with its files written as the FST names them.
+
+Plain contents are one CBC chain; the TMD size may be the unpadded plaintext length (system titles do this), so the `.app` is `size` rounded up to 16 and the SHA-1 covers the first `size` plaintext bytes. Hashed contents check H0 of every block against the header, the header's H1 and H2 groups against each other, and H2 against the `.h3` table, whose own SHA-1 must match the TMD. A file entry with flag `0x0004` keeps its offset as stored instead of shifting it left by five.
+
+A wrong title key or common key surfaces as `InvalidDataException` mentioning the FST; a damaged content as one naming the block and hash level.
+
 ## Public API
 
 ```
@@ -167,10 +188,31 @@ ContentRule(string pattern, ContentDetails details, bool contentPerMatch = false
 ContentDetails(bool hashed, ushort groupId, ulong parentTitleId, ushort entryFlags)
 ContentRules.Common(ushort groupId, ulong parentTitleId)
 Ticket.Build(titleId, titleKey, commonKey) → byte[]
+Ticket.Build(titleId, encryptedTitleKey) → byte[]                     // no common key needed
+Ticket.Parse(byte[]) → TicketInfo { TitleId, TitleKey: EncryptedTitleKey }
 Tmd.Build(TitleInfo, IReadOnlyList<ContentRecord>) → byte[]
+Tmd.Parse(byte[]) → TmdInfo { Title, Contents }
 CertificateChain.Stub() → byte[]
+Fst.Parse(byte[]) → Fst { ContentCount, Files: FstFile { Path, ContentIndex, Offset, Length, Flags } }
+EncryptedTitleKey.Parse(hex) / .Decrypt(titleId, commonKey) → TitleKey
+TitleKey.Encrypt(titleId, commonKey) → EncryptedTitleKey
+
+NusDownloader(HttpClient client, string? baseUrl = null)
+  .DownloadAsync(TitleId titleId, string outputDirectory,
+        EncryptedTitleKey? titleKey = null,             // fake ticket when the server has none
+        CommonKey? commonKey = null,                    // check content 0 before fetching the rest
+        IProgress<NusDownloadProgress>? progress = null, CancellationToken cancellationToken = default)
+  → TmdInfo
+
+NusUnpacker(CommonKey commonKey)
+  .KeysMatch(string packageDirectory) → bool
+  .Unpack(string packageDirectory, string outputDirectory,
+        IProgress<string>? progress = null, CancellationToken cancellationToken = default)
+  → NusPackage
+NusUnpacker.Unpack(packageDirectory, outputDirectory, TitleKey titleKey, ...)   // ticket not read
+NusUnpacker.KeysMatch(packageDirectory, TitleKey titleKey) → bool
 ```
 
 ## Credits
 
-Format facts from NUSPacker by Maschell (timogus), as maintained by ihaveamac; CNUSPACKER by NicoAICP, ZestyTS and Morilli is its C# port. This library is a fresh implementation of the format.
+Format facts from NUSPacker by Maschell (timogus), as maintained by ihaveamac; CNUSPACKER by NicoAICP, ZestyTS and Morilli is its C# port. The decrypt side reads what CDecrypt by crediar reads, including the H0 XOR and the unshifted-offset flag. This library is a fresh implementation of the format.

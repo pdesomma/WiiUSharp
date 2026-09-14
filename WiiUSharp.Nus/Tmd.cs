@@ -4,7 +4,7 @@ using System.Text;
 namespace WiiUSharp.Nus;
 
 /// <summary>
-/// Builds the fake-signed title.tmd.
+/// Builds and reads the title.tmd.
 /// </summary>
 public static class Tmd
 {
@@ -59,6 +59,34 @@ public static class Tmd
         infos.CopyTo(tmd, NusFormat.TmdHeaderSize);
         records.CopyTo(tmd, ContentRecordsOffset);
         return tmd;
+    }
+
+    /// <summary>
+    /// Reads title values and the content records.
+    /// </summary>
+    /// <param name="tmd">TMD bytes.</param>
+    /// <exception cref="InvalidDataException">Too short for the content count it declares.</exception>
+    public static TmdInfo Parse(byte[] tmd)
+    {
+        if (tmd is null)
+            throw new ArgumentNullException(nameof(tmd));
+        if (tmd.Length < ContentRecordsOffset)
+            throw new InvalidDataException($"TMD is {tmd.Length} bytes; expected at least {ContentRecordsOffset}.");
+
+        var count = BigEndian.ReadUInt16(tmd, 0x1DE);
+        if (count == 0 || tmd.Length < ContentRecordsOffset + count * NusFormat.ContentRecordSize)
+            throw new InvalidDataException($"TMD declares {count} contents but holds {(tmd.Length - ContentRecordsOffset) / NusFormat.ContentRecordSize}.");
+
+        var info = new TitleInfo(
+            new TitleId(BigEndian.ReadUInt64(tmd, TitleIdOffset)),
+            BigEndian.ReadUInt16(tmd, 0x198),
+            BigEndian.ReadUInt16(tmd, 0x1DC),
+            BigEndian.ReadUInt64(tmd, 0x184),
+            BigEndian.ReadUInt32(tmd, 0x19A));
+        var contents = new ContentRecord[count];
+        for (var i = 0; i < count; i++)
+            contents[i] = ContentRecord.Parse(tmd, ContentRecordsOffset + i * NusFormat.ContentRecordSize);
+        return new TmdInfo(info, contents);
     }
 
     private static byte[] Sha256(byte[] data)

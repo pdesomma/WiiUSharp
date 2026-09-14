@@ -98,7 +98,7 @@ public class NusPackerTests
     {
         var messages = new List<string>();
 
-        new NusPacker(Reference.CommonKey).Pack(_title, _output, Reference.TitleKey, progress: new SyncProgress(messages.Add));
+        new NusPacker(Reference.CommonKey).Pack(_title, _output, Reference.TitleKey, progress: new SyncProgress<string>(messages.Add));
 
         Assert.AreEqual(9, messages.Count);
         StringAssert.StartsWith(messages[0], "Packing content 00000001");
@@ -129,17 +129,5 @@ public class NusPackerTests
         Assert.AreEqual(0, info.TitleVersion);
         Assert.AreEqual(TitleInfo.DefaultOsVersion, info.OsVersion);
         Assert.AreEqual(TitleInfo.DefaultAppType, info.AppType);
-    }
-
-    private sealed class SyncProgress : IProgress<string>
-    {
-        private readonly Action<string> _report;
-
-        public SyncProgress(Action<string> report)
-        {
-            _report = report;
-        }
-
-        public void Report(string value) => _report(value);
     }
 }

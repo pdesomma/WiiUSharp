@@ -79,6 +79,45 @@ public class TmdTests
         Assert.ThrowsExactly<ArgumentException>(() => new ContentRecord(0, ContentType.Content, 0, new byte[19]));
     }
 
+    [TestMethod]
+    public void Parse_BuiltTmd_RoundTripsTitleAndRecords()
+    {
+        var records = new[] { Record(0), Record(1, ContentType.Content | ContentType.Encrypted | ContentType.Hashed, 0x20000), new ContentRecord(2, ContentType.Content | ContentType.Encrypted, 0x8000, Reference.Pattern(20, 2), 0xABCD1234) };
+
+        var parsed = Tmd.Parse(Tmd.Build(Info, records));
+
+        Assert.AreEqual(Info.TitleId, parsed.Title.TitleId);
+        Assert.AreEqual(Info.GroupId, parsed.Title.GroupId);
+        Assert.AreEqual(Info.TitleVersion, parsed.Title.TitleVersion);
+        Assert.AreEqual(Info.OsVersion, parsed.Title.OsVersion);
+        Assert.AreEqual(Info.AppType, parsed.Title.AppType);
+        Assert.AreEqual(3, parsed.Contents.Count);
+        for (var i = 0; i < 3; i++)
+        {
+            Assert.AreEqual(records[i].Index, parsed.Contents[i].Index);
+            Assert.AreEqual(records[i].Id, parsed.Contents[i].Id);
+            Assert.AreEqual(records[i].Type, parsed.Contents[i].Type);
+            Assert.AreEqual(records[i].Size, parsed.Contents[i].Size);
+            CollectionAssert.AreEqual(records[i].Hash, parsed.Contents[i].Hash);
+        }
+        Assert.IsTrue(parsed.Contents[1].IsHashed);
+        Assert.AreEqual(0xABCD1234u, Reference.ReadUInt32(records[2].ToBytes(), 0));
+    }
+
+    [TestMethod]
+    public void Parse_BadBytes_Throws()
+    {
+        Assert.ThrowsExactly<InvalidDataException>(() => Tmd.Parse(new byte[Tmd.ContentRecordsOffset - 1]));
+        Assert.ThrowsExactly<InvalidDataException>(() => Tmd.Parse(new byte[Tmd.ContentRecordsOffset]));
+        var tmd = Tmd.Build(Info, new[] { Record(0), Record(1) });
+        Assert.ThrowsExactly<InvalidDataException>(() => Tmd.Parse(tmd.Take(tmd.Length - 1).ToArray()));
+        Assert.ThrowsExactly<ArgumentNullException>(() => Tmd.Parse(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => ContentRecord.Parse(null!, 0));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => ContentRecord.Parse(new byte[10], 0));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new TmdInfo(null!, Array.Empty<ContentRecord>()));
+        Assert.ThrowsExactly<ArgumentNullException>(() => new TmdInfo(Info, null!));
+    }
+
     private static ContentRecord Record(int index, ContentType type = ContentType.Content | ContentType.Encrypted, long size = 0x8000) =>
         new(index, type, size, Reference.Pattern(20, index));
 }

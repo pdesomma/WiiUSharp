@@ -17,6 +17,14 @@ public readonly struct TitleKey : IEquatable<TitleKey>
         _bytes = KeyBytes.Validate(bytes);
     }
 
+    /// <summary>
+    /// Wraps the key the way a ticket stores it.
+    /// </summary>
+    /// <param name="titleId">Title ID; forms the IV.</param>
+    /// <param name="commonKey">Wrapping key.</param>
+    public EncryptedTitleKey Encrypt(TitleId titleId, CommonKey commonKey) =>
+        new(Ticket.EncryptTitleKey(titleId, this, commonKey));
+
     /// <inheritdoc/>
     public bool Equals(TitleKey other) => ToArray().SequenceEqual(other.ToArray());
 
@@ -46,4 +54,9 @@ public readonly struct TitleKey : IEquatable<TitleKey>
     /// Copy of the key bytes.
     /// </summary>
     public byte[] ToArray() => (byte[])(_bytes ?? new byte[NusFormat.KeySize]).Clone();
+
+    /// <summary>
+    /// Key as lowercase hex.
+    /// </summary>
+    public override string ToString() => KeyBytes.ToHex(ToArray());
 }

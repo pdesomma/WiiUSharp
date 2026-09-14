@@ -17,6 +17,17 @@ internal static class KeyBytes
         return bytes;
     }
 
+    public static string ToHex(byte[] bytes)
+    {
+        var chars = new char[bytes.Length * 2];
+        for (var i = 0; i < bytes.Length; i++)
+        {
+            chars[i * 2] = Digit(bytes[i] >> 4);
+            chars[i * 2 + 1] = Digit(bytes[i] & 0xF);
+        }
+        return new string(chars);
+    }
+
     public static byte[] Validate(byte[] bytes)
     {
         if (bytes is null)
@@ -26,4 +37,6 @@ internal static class KeyBytes
 
         return (byte[])bytes.Clone();
     }
+
+    private static char Digit(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
 }

@@ -4,7 +4,7 @@
 
 Not affiliated with or endorsed by Nintendo. Wii U is a trademark of Nintendo.
 
-The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) by sabykos, piratesephiroth and FIX94, the NUS package layout from [NUSPacker](https://github.com/ihaveamac/NUSPacker) by Maschell (timogus), and RPX compression from [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) by CBH. `WiiUSharp.Nfs`, `WiiUSharp.Nus` and `WiiUSharp.Rpx` are new implementations of those formats, not ports of their code.
+The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FIX94/nfs2iso2nfs) by sabykos, piratesephiroth and FIX94, the NUS package layout from [NUSPacker](https://github.com/ihaveamac/NUSPacker) by Maschell (timogus) and [CDecrypt](https://github.com/crediar/cdecrypt) by crediar, and RPX compression from [wiiurpxtool](https://github.com/0CBH0/wiiurpxtool) by CBH. `WiiUSharp.Nfs`, `WiiUSharp.Nus` and `WiiUSharp.Rpx` are new implementations of those formats, not ports of their code.
 
 No keys ship with these packages. The common key, title keys and `htk.bin` are yours to supply.
 
@@ -16,7 +16,7 @@ No keys ship with these packages. The common key, title keys and `htk.bin` are y
 | `WiiUSharp.Nfs` | net48, net6.0, net8.0, net10.0 | The vWii disc container (`content/hif_*.nfs`): header, sparse part table, per-sector AES, 250 MB split. |
 | `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
 | `WiiUSharp.Audio` | net48, net6.0, net8.0, net10.0 | Turns WAV, MP3 or AIFF into `bootSound.btsnd`: 48 kHz stereo 16-bit, six seconds. NAudio.Core + NLayer; no Windows codecs. |
-| `WiiUSharp.Nus` | net48, net6.0, net8.0, net10.0 | Packs a `code`/`content`/`meta` folder into an installable title: FST, hashed and plain contents, fake-signed TMD and ticket. |
+| `WiiUSharp.Nus` | net48, net6.0, net8.0, net10.0 | Packs a `code`/`content`/`meta` folder into an installable title: FST, hashed and plain contents, fake-signed TMD and ticket. Downloads a title's package from the update server and unpacks it back into those folders. |
 | `WiiUSharp.Rpx` | net48, net6.0, net8.0, net10.0 | RPX/RPL executables: load with every section plain, replace section bytes, save compressed or not with the CRC table rebuilt. |
 
 ```
@@ -95,6 +95,24 @@ NusPackage package = packer.Pack(@"title", @"out", TitleKey.Parse("1337133713371
 ```
 
 Title values come from `code/app.xml`; pass a `TitleInfo` to override them, your own `ContentRule` list to change which files share a content, or a real `title.cert` to replace the generated stub. Output is fake-signed and installs with the usual signature patches. See [.docs/WiiUSharp.Nus.md](.docs/WiiUSharp.Nus.md).
+
+### Downloading and unpacking a title
+
+```csharp
+using WiiUSharp.Nus;
+
+var commonKey = CommonKey.Parse("<wii u common key>");
+var titleKey = EncryptedTitleKey.Parse("<title key as the ticket stores it>");   // what title key lists carry
+
+var downloader = new NusDownloader(new HttpClient());
+await downloader.DownloadAsync(TitleId.Parse("00050000101BAF00"), @"package", titleKey, commonKey);
+// package\title.tmd, title.tik (built from the key; retail games have none on the server), 00000000.app ... and .h3 files
+// With the common key given, content 0 must decrypt to an FST before anything large is fetched.
+
+new NusUnpacker(commonKey).Unpack(@"package", @"title");   // title\code, content, meta — every hash verified
+```
+
+Nothing is needed to download but the title ID; the keys only decrypt. See [.docs/WiiUSharp.Nus.md](.docs/WiiUSharp.Nus.md).
 
 ### Executables
 

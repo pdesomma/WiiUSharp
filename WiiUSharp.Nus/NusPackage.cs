@@ -34,9 +34,9 @@ public sealed class NusPackage
             yield return Path.Combine(OutputDirectory, NusFormat.CertificateFileName);
             foreach (var content in Contents)
             {
-                yield return Path.Combine(OutputDirectory, NusFormat.ContentFileName(content.Index));
+                yield return Path.Combine(OutputDirectory, NusFormat.ContentFileName(content.Id));
                 if (content.IsHashed)
-                    yield return Path.Combine(OutputDirectory, NusFormat.HashFileName(content.Index));
+                    yield return Path.Combine(OutputDirectory, NusFormat.HashFileName(content.Id));
             }
         }
     }

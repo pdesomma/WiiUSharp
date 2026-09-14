@@ -4,7 +4,7 @@ using System.Text;
 namespace WiiUSharp.Nus;
 
 /// <summary>
-/// Builds the fake-signed title.tik.
+/// Builds and reads the title.tik.
 /// </summary>
 public static class Ticket
 {
@@ -41,6 +41,19 @@ public static class Ticket
     }
 
     /// <summary>
+    /// Builds a ticket around an already wrapped title key; no common key needed.
+    /// </summary>
+    /// <param name="titleId">Title the ticket is for.</param>
+    /// <param name="titleKey">Wrapped key as title key lists carry it.</param>
+    public static byte[] Build(TitleId titleId, EncryptedTitleKey titleKey)
+    {
+        var random = new byte[0x100 + 6];
+        using (var generator = RandomNumberGenerator.Create())
+            generator.GetBytes(random);
+        return Build(titleId, titleKey.ToArray(), random);
+    }
+
+    /// <summary>
     /// Encrypts a title key the way the ticket stores it.
     /// </summary>
     /// <param name="titleId">Title ID; forms the IV.</param>
@@ -52,14 +65,34 @@ public static class Ticket
         return aes.Encrypt(titleKey.ToArray(), Aes128Cbc.IvFor(titleId));
     }
 
-    internal static byte[] Build(TitleId titleId, TitleKey titleKey, CommonKey commonKey, byte[] random)
+    /// <summary>
+    /// Reads the title ID and wrapped title key.
+    /// </summary>
+    /// <param name="ticket">Ticket bytes.</param>
+    /// <exception cref="InvalidDataException">Too short to be a ticket.</exception>
+    public static TicketInfo Parse(byte[] ticket)
+    {
+        if (ticket is null)
+            throw new ArgumentNullException(nameof(ticket));
+        if (ticket.Length < TitleIdOffset + 8)
+            throw new InvalidDataException($"Ticket is {ticket.Length} bytes; expected at least {TitleIdOffset + 8}.");
+
+        var key = new byte[NusFormat.KeySize];
+        Array.Copy(ticket, EncryptedTitleKeyOffset, key, 0, key.Length);
+        return new TicketInfo(new TitleId(BigEndian.ReadUInt64(ticket, TitleIdOffset)), new EncryptedTitleKey(key));
+    }
+
+    internal static byte[] Build(TitleId titleId, TitleKey titleKey, CommonKey commonKey, byte[] random) =>
+        Build(titleId, EncryptTitleKey(titleId, titleKey, commonKey), random);
+
+    private static byte[] Build(TitleId titleId, byte[] encryptedTitleKey, byte[] random)
     {
         var ticket = new byte[NusFormat.TicketSize];
         BigEndian.Write(ticket, 0x000, 0x00010004u);
         Array.Copy(random, 0, ticket, 0x004, 0x100);
         Encoding.ASCII.GetBytes(Issuer).CopyTo(ticket, 0x140);
         ticket[0x1BC] = 0x01;
-        EncryptTitleKey(titleId, titleKey, commonKey).CopyTo(ticket, EncryptedTitleKeyOffset);
+        encryptedTitleKey.CopyTo(ticket, EncryptedTitleKeyOffset);
         ticket[0x1D1] = 0x05;
         Array.Copy(random, 0x100, ticket, 0x1D2, 6);
         BigEndian.Write(ticket, TitleIdOffset, titleId.Value);

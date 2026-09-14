@@ -84,11 +84,23 @@ public static class NusFormat
     /// Name of a content file.
     /// </summary>
     /// <param name="index">Content index.</param>
-    public static string ContentFileName(int index) => index.ToString("X8", CultureInfo.InvariantCulture) + ".app";
+    public static string ContentFileName(int index) => ContentFileName((uint)index);
+
+    /// <summary>
+    /// Name of a content file.
+    /// </summary>
+    /// <param name="id">Content ID.</param>
+    public static string ContentFileName(uint id) => id.ToString("X8", CultureInfo.InvariantCulture) + ".app";
 
     /// <summary>
     /// Name of the H3 table of a hashed content.
     /// </summary>
     /// <param name="index">Content index.</param>
-    public static string HashFileName(int index) => index.ToString("X8", CultureInfo.InvariantCulture) + ".h3";
+    public static string HashFileName(int index) => HashFileName((uint)index);
+
+    /// <summary>
+    /// Name of the H3 table of a hashed content.
+    /// </summary>
+    /// <param name="id">Content ID.</param>
+    public static string HashFileName(uint id) => id.ToString("X8", CultureInfo.InvariantCulture) + ".h3";
 }
