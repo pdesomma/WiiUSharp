@@ -13,11 +13,13 @@ The NFS container format was worked out from [nfs2iso2nfs](https://github.com/FI
 | `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation: `TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, and the `ImageSlot` / `BootSound` formats a title ships with. |
 | `WiiUSharp.Nfs` | net48, net6.0, net8.0, net10.0 | The vWii disc container (`content/hif_*.nfs`): header, sparse part table, per-sector AES, 250 MB split. |
 | `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
+| `WiiUSharp.Audio` | net48, net6.0, net8.0, net10.0 | Turns WAV, MP3 or AIFF into `bootSound.btsnd`: 48 kHz stereo 16-bit, six seconds. NAudio.Core + NLayer; no Windows codecs. |
 
 ```
 dotnet add package WiiUSharp
 dotnet add package WiiUSharp.Nfs
 dotnet add package WiiUSharp.Imaging
+dotnet add package WiiUSharp.Audio
 ```
 
 ## Usage
@@ -48,6 +50,16 @@ using WiiUSharp.Imaging;
 TitleImage.Convert("icon.png", ImageSlot.Icon, @"title\meta\iconTex.tga");   // resized to 128x128, 32 bpp, uncompressed, no footer
 
 var problems = TitleImage.Problems(new TgaFile("bootTvTex.tga"), ImageSlot.BootTv);   // empty when it fits
+```
+
+### Boot sound
+
+```csharp
+using WiiUSharp.Audio;
+
+BootSoundConverter.Convert("boot.mp3", @"title\meta\bootSound.btsnd");   // resampled, stereo, first six seconds
+
+BootSound sound = BootSound.Load(@"title\meta\bootSound.btsnd");          // header + samples of an existing one
 ```
 
 ### NFS container

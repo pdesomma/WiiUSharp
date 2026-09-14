@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-14
+
+### Added
+- `BootSound` is now the .btsnd file model (header target and loop start, big-endian stereo PCM) with `Parse`/`Load`/`ToBytes`/`Save`; the format constants stay where they were.
+- `WiiUSharp.Audio`: `BootSoundConverter` decodes WAV, MP3 or AIFF, converts to 48 kHz stereo, trims to six seconds and writes a `BootSound`. NAudio.Core + NLayer, no Windows codecs.
+
 ## [0.3.0] - 2026-09-14
 
 ### Added
