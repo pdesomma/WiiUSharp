@@ -1,4 +1,4 @@
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace WiiUSharp;
 
@@ -27,7 +27,7 @@ public sealed class AppXml : TitleXml
 
         Set("title_id", game.TitleId.ToString());
         Set("group_id", game.GroupId.ToString());
-        SetUInt32("title_version", game.TitleVersion);
+        SetHex("title_version", game.TitleVersion, TitleVersionBytes);
     }
 
     /// <summary>

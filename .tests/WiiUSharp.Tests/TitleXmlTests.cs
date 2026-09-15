@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace WiiUSharp.Tests;
 
@@ -30,7 +30,7 @@ public class TitleXmlTests
 
         Assert.AreEqual("000500021234ABCD", app.Get("title_id"));
         Assert.AreEqual("0000ABCD", app.Get("group_id"));
-        Assert.AreEqual("16", app.Get("title_version"));
+        Assert.AreEqual("0010", app.Get("title_version"), "hexBinary, not decimal");
         Assert.AreEqual("0000000000000000", app.Get("os_version"));
         Assert.AreEqual(SuperMetroid.TitleId, app.ReadTitleId());
     }
@@ -65,8 +65,8 @@ public class TitleXmlTests
         Assert.AreEqual("0000ABCD", meta.Get("group_id"));
         Assert.AreEqual("WUP-N-FAAE", meta.Get("product_code"));
         Assert.AreEqual("0001", meta.Get("company_code"));
-        Assert.AreEqual("16", meta.Get("title_version"));
-        Assert.AreEqual("4294967295", meta.Get("region"));
+        Assert.AreEqual("0010", meta.Get("title_version"), "hexBinary, not decimal");
+        Assert.AreEqual("FFFFFFFF", meta.Get("region"), "hexBinary, not decimal");
         Assert.AreEqual("65537", meta.Get("drc_use"));
         Assert.AreEqual("Super\nMetroid", meta.Get("longname_en"));
         Assert.AreEqual("Super Metroid", meta.Get("shortname_en"));
@@ -105,7 +105,8 @@ public class TitleXmlTests
         meta.Save(output);
         var text = Encoding.UTF8.GetString(output.ToArray());
 
-        StringAssert.StartsWith(text, "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        CollectionAssert.AreEqual(Encoding.UTF8.GetPreamble(), output.ToArray().Take(3).ToArray(), "Nintendo's own meta.xml carries a BOM");
+        StringAssert.StartsWith(text.TrimStart('﻿'), "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         StringAssert.Contains(text, "<title_id type=\"hexBinary\" length=\"8\">000500021234ABCD</title_id>");
         StringAssert.Contains(text, "<version type=\"unsignedInt\" length=\"4\">33</version>");
         StringAssert.Contains(text, "<longname_en type=\"string\" length=\"512\">Super\nMetroid</longname_en>");

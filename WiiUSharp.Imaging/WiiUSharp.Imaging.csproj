@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.0</Version>
+    <Version>0.7.1</Version>
     <Title>WiiUSharp.Imaging</Title>
     <Description>Turns PNG, JPEG, BMP, WebP or TGA sources into the exact TGA images a Wii U title needs (icon, boot screens, logo). Cross-platform via SkiaSharp.</Description>
     <PackageReleaseNotes>0.7.0: version aligned; no changes.</PackageReleaseNotes>

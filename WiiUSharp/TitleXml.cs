@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -10,6 +10,15 @@ namespace WiiUSharp;
 /// </summary>
 public abstract class TitleXml
 {
+    /// <summary>
+    /// Width of the title_version field in bytes; it is hexBinary, not a number.
+    /// </summary>
+    public const int TitleVersionBytes = 2;
+    /// <summary>
+    /// Width of the region field in bytes; it is hexBinary, not a number.
+    /// </summary>
+    public const int RegionBytes = 4;
+
     private protected TitleXml(XDocument document, string rootName)
     {
         Document = document ?? throw new ArgumentNullException(nameof(document));
@@ -47,7 +56,7 @@ public abstract class TitleXml
     {
         var settings = new XmlWriterSettings
         {
-            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true),
             Indent = false,
             NewLineHandling = NewLineHandling.None,
         };
@@ -71,10 +80,18 @@ public abstract class TitleXml
         return LoadDocument(stream);
     }
 
+    private protected uint GetHex(string element) =>
+        uint.TryParse(Get(element), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var value)
+            ? value
+            : throw new InvalidDataException($"<{element}> is not hexadecimal.");
+
     private protected uint GetUInt32(string element) =>
         uint.TryParse(Get(element), NumberStyles.None, CultureInfo.InvariantCulture, out var value)
             ? value
             : throw new InvalidDataException($"<{element}> is not a number.");
+
+    private protected void SetHex(string element, uint value, int bytes) =>
+        Set(element, value.ToString("X" + (bytes * 2).ToString(CultureInfo.InvariantCulture), CultureInfo.InvariantCulture));
 
     private protected void SetUInt32(string element, uint value) => Set(element, value.ToString(CultureInfo.InvariantCulture));
 

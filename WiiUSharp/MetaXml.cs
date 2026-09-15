@@ -1,4 +1,4 @@
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace WiiUSharp;
 
@@ -29,8 +29,8 @@ public sealed class MetaXml : TitleXml
         Set("group_id", game.GroupId.ToString());
         Set("product_code", game.ProductCode.ToString());
         Set("company_code", game.CompanyCode);
-        SetUInt32("title_version", game.TitleVersion);
-        SetUInt32("region", (uint)game.Region);
+        SetHex("title_version", game.TitleVersion, TitleVersionBytes);
+        SetHex("region", (uint)game.Region, RegionBytes);
         SetUInt32("drc_use", game.GamePadUse);
         foreach (var pair in game.Names)
         {
@@ -68,8 +68,8 @@ public sealed class MetaXml : TitleXml
         return new Game(TitleId.Parse(Get("title_id")), GroupId.Parse(Get("group_id")), ProductCode.Parse(Get("product_code")))
         {
             CompanyCode = Get("company_code"),
-            TitleVersion = checked((ushort)GetUInt32("title_version")),
-            Region = (Region)GetUInt32("region"),
+            TitleVersion = checked((ushort)GetHex("title_version")),
+            Region = (Region)GetHex("region"),
             GamePadUse = GetUInt32("drc_use"),
             Names = names,
         };
