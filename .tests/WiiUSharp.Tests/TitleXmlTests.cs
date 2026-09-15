@@ -66,13 +66,23 @@ public class TitleXmlTests
         Assert.AreEqual("WUP-N-FAAE", meta.Get("product_code"));
         Assert.AreEqual("0001", meta.Get("company_code"));
         Assert.AreEqual("0010", meta.Get("title_version"), "hexBinary, not decimal");
-        Assert.AreEqual("FFFFFFFF", meta.Get("region"), "hexBinary, not decimal");
+        Assert.AreEqual("2", meta.Get("region"), "an all-region game leaves the base's region alone");
         Assert.AreEqual("65537", meta.Get("drc_use"));
         Assert.AreEqual("Super\nMetroid", meta.Get("longname_en"));
         Assert.AreEqual("Super Metroid", meta.Get("shortname_en"));
         Assert.AreEqual("スーパーメトロイド", meta.Get("longname_ja"));
         Assert.AreEqual("Base Title FR", meta.Get("longname_fr"));
         Assert.AreEqual("00000000", meta.Get("reserved_flag2"));
+    }
+
+    [TestMethod]
+    public void MetaXmlApplyChosenRegion_WritesItAsHex()
+    {
+        var meta = MetaXml.Load(Stream(MetaXmlText));
+
+        meta.Apply(new Game(SuperMetroid.TitleId, SuperMetroid.GroupId, SuperMetroid.ProductCode) { Region = Region.Japan });
+
+        Assert.AreEqual("00000001", meta.Get("region"));
     }
 
     [TestMethod]
@@ -88,7 +98,7 @@ public class TitleXmlTests
         Assert.AreEqual(SuperMetroid.ProductCode, game.ProductCode);
         Assert.AreEqual("0001", game.CompanyCode);
         Assert.AreEqual((ushort)16, game.TitleVersion);
-        Assert.AreEqual(Region.All, game.Region);
+        Assert.AreEqual(Region.UnitedStates, game.Region, "an all-region game leaves the base's region alone");
         Assert.AreEqual(65537u, game.GamePadUse);
         Assert.AreEqual(new LocalizedName("Super Metroid", "Super\nMetroid"), game.NameIn(Language.English));
         Assert.AreEqual("Base Title FR", game.NameIn(Language.French)!.LongName);

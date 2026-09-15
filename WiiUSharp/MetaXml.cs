@@ -17,7 +17,7 @@ public sealed class MetaXml : TitleXml
     }
 
     /// <summary>
-    /// Writes the game's identity, region, GamePad use and names. Names for languages the game does not provide are left as they are.
+    /// Writes the game's identity, GamePad use and names; the region only when it is not <see cref="Region.All"/>. Names for languages the game does not provide are left as they are.
     /// </summary>
     /// <param name="game">Values to write.</param>
     public void Apply(Game game)
@@ -30,7 +30,8 @@ public sealed class MetaXml : TitleXml
         Set("product_code", game.ProductCode.ToString());
         Set("company_code", game.CompanyCode);
         SetHex("title_version", game.TitleVersion, TitleVersionBytes);
-        SetHex("region", (uint)game.Region, RegionBytes);
+        if (game.Region != Region.All)
+            SetHex("region", (uint)game.Region, RegionBytes);
         SetUInt32("drc_use", game.GamePadUse);
         foreach (var pair in game.Names)
         {
