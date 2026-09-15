@@ -1,4 +1,4 @@
-using SkiaSharp;
+﻿using SkiaSharp;
 using TargaSharp;
 
 namespace WiiUSharp.Imaging.Tests;
@@ -24,7 +24,11 @@ public class TitleImageTests
             Assert.AreEqual(170, loaded.Width);
             Assert.AreEqual(42, loaded.Height);
             Assert.AreEqual(TgaPixelDepth.Bpp32, loaded.Header.ImageSpec.PixelDepth);
-            Assert.IsNull(loaded.Footer);
+            Assert.IsNotNull(loaded.Footer);
+            Assert.IsNull(loaded.ExtensionArea);
+            var bytes = File.ReadAllBytes(tga);
+            Assert.AreEqual(18 + 170 * 42 * 4 + 26, bytes.Length, "header, pixels, bare footer: what retail titles carry");
+            Assert.AreEqual("TRUEVISION-XFILE.\0", System.Text.Encoding.ASCII.GetString(bytes, bytes.Length - 18, 18));
         }
         finally
         {
@@ -59,18 +63,32 @@ public class TitleImageTests
     }
 
     [TestMethod]
-    public void FromTgaKeepsPixelsAndStripsTheFooterWhenItAlreadyFits()
+    public void FromTgaKeepsPixelsAndDropsTheExtensionAreaWhenItAlreadyFits()
     {
         var source = new TgaFile(128, 128, TgaPixelDepth.Bpp32, TgaImageType.UncompressedTrueColor, attrBits: 8, newFormat: true);
         source.ImageArea.ImageData = Enumerable.Range(0, 128 * 128 * 4).Select(i => (byte)i).ToArray();
-        Assert.IsNotNull(source.Footer);
+        Assert.IsNotNull(source.ExtensionArea);
 
         var result = TitleImage.FromTga(source, ImageSlot.Icon);
 
-        Assert.IsNull(result.Footer);
+        Assert.IsNotNull(result.Footer);
         Assert.IsNull(result.ExtensionArea);
         CollectionAssert.AreEqual(source.ImageArea.ImageData, result.ImageArea.ImageData);
-        Assert.IsNotNull(source.Footer);
+        Assert.IsNotNull(source.ExtensionArea, "the source is untouched");
+    }
+
+    [TestMethod]
+    public void FromTgaAddsTheFooterToAnOldFormatSourceThatAlreadyFits()
+    {
+        var source = new TgaFile(128, 128, TgaPixelDepth.Bpp32, TgaImageType.UncompressedTrueColor, attrBits: 8, newFormat: false);
+        source.ImageArea.ImageData = Enumerable.Range(0, 128 * 128 * 4).Select(i => (byte)i).ToArray();
+
+        var result = TitleImage.FromTga(source, ImageSlot.Icon);
+
+        Assert.IsNotNull(result.Footer);
+        Assert.IsNull(result.ExtensionArea);
+        Assert.AreEqual(0, TitleImage.Problems(result, ImageSlot.Icon).Count);
+        CollectionAssert.AreEqual(source.ImageArea.ImageData, result.ImageArea.ImageData);
     }
 
     [TestMethod]
@@ -122,7 +140,8 @@ public class TitleImageTests
             Assert.AreEqual(TgaImageType.UncompressedTrueColor, tga.Header.ImageType);
             Assert.AreEqual(8, tga.Header.ImageSpec.ImageDescriptor.AlphaChannelBits);
             Assert.AreEqual(TgaImageOrigin.BottomLeft, tga.Header.ImageSpec.ImageDescriptor.ImageOrigin);
-            Assert.IsNull(tga.Footer);
+            Assert.IsNotNull(tga.Footer);
+            Assert.IsNull(tga.ExtensionArea);
             CollectionAssert.AreEqual(new byte[] { 255, 0, 0, 255 }, Pixel(tga, 0, 0));
             CollectionAssert.AreEqual(new byte[] { 0, 0, 255, 255 }, Pixel(tga, 127, 127));
             Assert.AreEqual(0, TitleImage.Problems(tga, ImageSlot.Icon).Count);
@@ -145,8 +164,20 @@ public class TitleImageTests
         StringAssert.Contains(problems[0], "100x50");
         StringAssert.Contains(problems[1], "24 bpp");
         StringAssert.Contains(problems[2], "RleTrueColor");
-        StringAssert.Contains(problems[3], "footer");
+        StringAssert.Contains(problems[3], "extension");
         Assert.ThrowsExactly<InvalidDataException>(() => TitleImage.Verify(wrong, ImageSlot.Icon));
+    }
+
+    [TestMethod]
+    public void ProblemsReportsAMissingFooter()
+    {
+        var old = new TgaFile(128, 128, TgaPixelDepth.Bpp32, TgaImageType.UncompressedTrueColor, attrBits: 8, newFormat: false);
+        old.ImageArea.ImageData = new byte[128 * 128 * 4];
+
+        var problems = TitleImage.Problems(old, ImageSlot.Icon);
+
+        Assert.AreEqual(1, problems.Count);
+        StringAssert.Contains(problems[0], "footer");
     }
 
     private static byte[] Pixel(TgaFile tga, int x, int row)

@@ -1,4 +1,4 @@
-namespace WiiUSharp.Tests;
+﻿namespace WiiUSharp.Tests;
 
 [TestClass]
 public class GameTests
@@ -11,7 +11,7 @@ public class GameTests
         Assert.AreEqual(Region.All, game.Region);
         Assert.AreEqual(Game.NintendoCompanyCode, game.CompanyCode);
         Assert.AreEqual((ushort)0, game.TitleVersion);
-        Assert.AreEqual(0u, game.GamePadUse);
+        Assert.IsNull(game.GamePadUse, "leaves the base's drc_use alone");
         Assert.AreEqual(0, game.Names.Count);
     }
 

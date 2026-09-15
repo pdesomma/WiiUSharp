@@ -65,7 +65,7 @@ public class TitleXmlTests
         Assert.AreEqual("0000ABCD", meta.Get("group_id"));
         Assert.AreEqual("WUP-N-FAAE", meta.Get("product_code"));
         Assert.AreEqual("0001", meta.Get("company_code"));
-        Assert.AreEqual("0010", meta.Get("title_version"), "hexBinary, not decimal");
+        Assert.AreEqual("16", meta.Get("title_version"), "unsignedInt in meta.xml, unlike app.xml");
         Assert.AreEqual("2", meta.Get("region"), "an all-region game leaves the base's region alone");
         Assert.AreEqual("65537", meta.Get("drc_use"));
         Assert.AreEqual("Super\nMetroid", meta.Get("longname_en"));
@@ -73,6 +73,18 @@ public class TitleXmlTests
         Assert.AreEqual("スーパーメトロイド", meta.Get("longname_ja"));
         Assert.AreEqual("Base Title FR", meta.Get("longname_fr"));
         Assert.AreEqual("00000000", meta.Get("reserved_flag2"));
+    }
+
+    [TestMethod]
+    public void MetaXmlApplyNoGamePadUse_LeavesTheBaseValueAlone()
+    {
+        var meta = MetaXml.Load(Stream(MetaXmlText));
+        meta.Set("drc_use", "1");
+
+        meta.Apply(new Game(SuperMetroid.TitleId, SuperMetroid.GroupId, SuperMetroid.ProductCode));
+
+        Assert.AreEqual("1", meta.Get("drc_use"));
+        Assert.AreEqual(1u, meta.Read().GamePadUse);
     }
 
     [TestMethod]
@@ -149,7 +161,7 @@ public class TitleXmlTests
         sb.Append("  <version type=\"unsignedInt\" length=\"4\">33</version>\n");
         sb.Append("  <product_code type=\"string\" length=\"32\">WUP-N-BASE</product_code>\n");
         sb.Append("  <company_code type=\"string\" length=\"8\">0001</company_code>\n");
-        sb.Append("  <title_version type=\"unsignedShort\" length=\"2\">0</title_version>\n");
+        sb.Append("  <title_version type=\"unsignedInt\" length=\"4\">0</title_version>\n");
         sb.Append("  <title_id type=\"hexBinary\" length=\"8\">0005000010000000</title_id>\n");
         sb.Append("  <group_id type=\"hexBinary\" length=\"4\">00000000</group_id>\n");
         sb.Append("  <region type=\"hexBinary\" length=\"4\">2</region>\n");

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.1</Version>
+    <Version>0.7.2</Version>
     <Title>WiiUSharp.Audio</Title>
     <Description>Turns WAV, MP3 or AIFF into the bootSound.btsnd a Wii U title plays at launch: 48 kHz stereo 16-bit, trimmed to six seconds. Cross-platform via NAudio.Core and NLayer.</Description>
     <PackageReleaseNotes>0.7.0: version aligned; no changes.</PackageReleaseNotes>

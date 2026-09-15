@@ -17,7 +17,7 @@ public sealed class MetaXml : TitleXml
     }
 
     /// <summary>
-    /// Writes the game's identity, GamePad use and names; the region only when it is not <see cref="Region.All"/>. Names for languages the game does not provide are left as they are.
+    /// Writes the game's identity and names; the region only when it is not <see cref="Region.All"/>, drc_use only when <see cref="Game.GamePadUse"/> is set. Names for languages the game does not provide are left as they are.
     /// </summary>
     /// <param name="game">Values to write.</param>
     public void Apply(Game game)
@@ -29,10 +29,11 @@ public sealed class MetaXml : TitleXml
         Set("group_id", game.GroupId.ToString());
         Set("product_code", game.ProductCode.ToString());
         Set("company_code", game.CompanyCode);
-        SetHex("title_version", game.TitleVersion, TitleVersionBytes);
+        SetUInt32("title_version", game.TitleVersion);
         if (game.Region != Region.All)
             SetHex("region", (uint)game.Region, RegionBytes);
-        SetUInt32("drc_use", game.GamePadUse);
+        if (game.GamePadUse is { } gamePadUse)
+            SetUInt32("drc_use", gamePadUse);
         foreach (var pair in game.Names)
         {
             Set("longname_" + pair.Key.Code(), pair.Value.LongName);
@@ -69,7 +70,7 @@ public sealed class MetaXml : TitleXml
         return new Game(TitleId.Parse(Get("title_id")), GroupId.Parse(Get("group_id")), ProductCode.Parse(Get("product_code")))
         {
             CompanyCode = Get("company_code"),
-            TitleVersion = checked((ushort)GetHex("title_version")),
+            TitleVersion = checked((ushort)GetUInt32("title_version")),
             Region = (Region)GetHex("region"),
             GamePadUse = GetUInt32("drc_use"),
             Names = names,

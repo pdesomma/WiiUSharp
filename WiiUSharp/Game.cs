@@ -1,4 +1,4 @@
-namespace WiiUSharp;
+﻿namespace WiiUSharp;
 
 /// <summary>
 /// Metadata the Wii U reads from an installed title.
@@ -28,9 +28,9 @@ public sealed class Game
     /// </summary>
     public string CompanyCode { get; init; } = NintendoCompanyCode;
     /// <summary>
-    /// Raw GamePad usage value; seen as 0, 1 or 65537.
+    /// Raw drc_use value; seen as 0, 1 or 65537. Null leaves the base's value alone.
     /// </summary>
-    public uint GamePadUse { get; init; }
+    public uint? GamePadUse { get; init; }
     /// <summary>
     /// Group shared with updates and DLC.
     /// </summary>

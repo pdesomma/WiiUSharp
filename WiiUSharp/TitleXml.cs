@@ -11,7 +11,7 @@ namespace WiiUSharp;
 public abstract class TitleXml
 {
     /// <summary>
-    /// Width of the title_version field in bytes; it is hexBinary, not a number.
+    /// Width of app.xml's title_version field in bytes; hexBinary there, unsignedInt in meta.xml.
     /// </summary>
     public const int TitleVersionBytes = 2;
     /// <summary>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.1</Version>
+    <Version>0.7.2</Version>
     <Title>WiiUSharp.Nus</Title>
     <Description>Packs an unpacked Wii U title (code, content, meta) into the installable NUS layout: FST, hashed and plain contents, fake-signed TMD and ticket. Downloads a title's package from the update server and unpacks it back into those folders with every hash verified.</Description>
     <PackageReleaseNotes>0.7.0: NusDownloader and NusUnpacker; TMD, ticket and FST parsing.</PackageReleaseNotes>

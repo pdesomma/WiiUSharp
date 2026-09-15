@@ -1,10 +1,10 @@
-using SkiaSharp;
+﻿using SkiaSharp;
 using TargaSharp;
 
 namespace WiiUSharp.Imaging;
 
 /// <summary>
-/// Produces the TGA a title slot expects: exact size, exact depth, uncompressed, no TGA 2.0 footer.
+/// Produces the TGA a title slot expects: exact size, exact depth, uncompressed, bare TGA 2.0 footer with no extension area, as retail titles carry.
 /// </summary>
 public static class TitleImage
 {
@@ -37,7 +37,7 @@ public static class TitleImage
     }
 
     /// <summary>
-    /// Returns the TGA unchanged apart from dropping the footer when it already fits the slot; otherwise resizes and converts it.
+    /// Returns the TGA unchanged apart from the footer shape when it already fits the slot; otherwise resizes and converts it.
     /// </summary>
     /// <param name="tga">Source image.</param>
     /// <param name="slot">Target slot.</param>
@@ -48,10 +48,11 @@ public static class TitleImage
         if (slot is null)
             throw new ArgumentNullException(nameof(slot));
 
-        if (Problems(tga, slot).All(p => p == FooterProblem))
+        if (Problems(tga, slot).All(p => p == FooterProblem || p == ExtensionProblem))
         {
             var copy = tga.Clone();
-            copy.ToOldFormat();
+            copy.DeveloperArea = null;
+            copy.ToNewFormat(false);
             return copy;
         }
 
@@ -101,8 +102,10 @@ public static class TitleImage
             problems.Add($"Depth is {(int)tga.Header.ImageSpec.PixelDepth} bpp; {slot.Name} needs {slot.BitDepth}.");
         if (tga.Header.ImageType != TgaImageType.UncompressedTrueColor)
             problems.Add($"Image type is {tga.Header.ImageType}; {slot.Name} needs uncompressed true color.");
-        if (tga.Footer is not null || tga.ExtensionArea is not null || tga.DeveloperArea is not null)
+        if (tga.Footer is null)
             problems.Add(FooterProblem);
+        if (tga.ExtensionArea is not null || tga.DeveloperArea is not null)
+            problems.Add(ExtensionProblem);
         return problems;
     }
 
@@ -119,7 +122,8 @@ public static class TitleImage
             throw new InvalidDataException(string.Join(" ", problems));
     }
 
-    private const string FooterProblem = "Has a TGA 2.0 footer or extension area.";
+    private const string ExtensionProblem = "Has a TGA extension or developer area.";
+    private const string FooterProblem = "Missing the TGA 2.0 footer.";
 
     private static SKBitmap Fit(SKBitmap bitmap, ImageSlot slot)
     {
@@ -142,6 +146,7 @@ public static class TitleImage
             attrBits: (byte)(slot.BitDepth == 32 ? 8 : 0),
             newFormat: false);
         tga.Header.ImageSpec.ImageDescriptor.ImageOrigin = TgaImageOrigin.BottomLeft;
+        tga.ToNewFormat(false);
 
         var data = new byte[slot.Width * slot.Height * bytesPerPixel];
         var source = bitmap.Bytes;

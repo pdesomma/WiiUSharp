@@ -1,10 +1,24 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+## [0.7.2] - 2026-09-15
+
+### Fixed
+- `TitleImage` writes the bare TGA 2.0 footer (no extension area) that retail `iconTex`/`bootTvTex`/`bootDrcTex`/`bootLogoTex` carry; it used to strip it, and the Wii U menu showed the title as a "?" tile. `Problems` now flags a missing footer and, separately, an extension or developer area. Needs TargaSharp 0.4.0.
+- `MetaXml` writes `title_version` as the `unsignedInt` meta.xml declares; only app.xml's copy is hexBinary.
+
+### Changed
+- `Game.GamePadUse` is `uint?`; null leaves the base's `drc_use` alone instead of forcing 0.
+
+## [0.7.1] - 2026-09-15
+
+### Fixed
+- `MetaXml`/`AppXml` write `title_version` (app.xml) and `region` as hexBinary; decimal values broke the Wii U menu.
 
 ## [0.7.0] - 2026-09-14
 
