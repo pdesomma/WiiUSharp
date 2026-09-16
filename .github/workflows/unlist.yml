@@ -1,0 +1,33 @@
+name: Unlist retired packages
+
+# Hides WiiUSharp.Nfs, WiiUSharp.Nus and WiiUSharp.Rpx from nuget.org search; they folded into WiiUSharp 0.8.0.
+# Unlisted versions stay restorable. Deprecation (the "use WiiUSharp instead" banner) is only settable on the website.
+on:
+  workflow_dispatch:
+
+jobs:
+  unlist:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: NuGet login (OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: bigguy3311
+
+      - name: Unlist every version
+        run: |
+          foreach ($id in 'WiiUSharp.Nfs', 'WiiUSharp.Nus', 'WiiUSharp.Rpx') {
+            $versions = (Invoke-RestMethod "https://api.nuget.org/v3-flatcontainer/$($id.ToLower())/index.json").versions
+            foreach ($v in $versions) {
+              dotnet nuget delete $id $v --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --non-interactive
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            }
+          }

@@ -1,4 +1,4 @@
-# WiiUSharp
+﻿# WiiUSharp
 
 .NET libraries for Wii U file formats and title concepts.
 
@@ -12,12 +12,11 @@ No keys ship with these packages. The common key, title keys and `htk.bin` are y
 
 | Package | Targets | Purpose |
 |---|---|---|
-| `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation: `TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, and the `ImageSlot` / `BootSound` formats a title ships with. |
-| `WiiUSharp.Nfs` | net48, net6.0, net8.0, net10.0 | The vWii disc container (`content/hif_*.nfs`): header, sparse part table, per-sector AES, 250 MB split. |
+| `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation (`TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, `ImageSlot` / `BootSound` formats, meta and app XML); `WiiUSharp.Nus`: pack a `code`/`content`/`meta` folder into an installable title (FST, hashed and plain contents, fake-signed TMD and ticket), download a title from the update server, unpack it back; `WiiUSharp.Nfs`: the vWii disc container (`content/hif_*.nfs`); `WiiUSharp.Rpx`: RPX/RPL executables with sections plain, replaceable and re-compressed. No dependencies. |
 | `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
 | `WiiUSharp.Audio` | net48, net6.0, net8.0, net10.0 | Turns WAV, MP3 or AIFF into `bootSound.btsnd`: 48 kHz stereo 16-bit, six seconds. NAudio.Core + NLayer; no Windows codecs. |
-| `WiiUSharp.Nus` | net48, net6.0, net8.0, net10.0 | Packs a `code`/`content`/`meta` folder into an installable title: FST, hashed and plain contents, fake-signed TMD and ticket. Downloads a title's package from the update server and unpacks it back into those folders. |
-| `WiiUSharp.Rpx` | net48, net6.0, net8.0, net10.0 | RPX/RPL executables: load with every section plain, replace section bytes, save compressed or not with the CRC table rebuilt. |
+
+`WiiUSharp.Nfs`, `WiiUSharp.Nus` and `WiiUSharp.Rpx` shipped as separate packages up to 0.7.2; from 0.8.0 they live inside `WiiUSharp` under the same namespaces.
 
 ```
 dotnet add package WiiUSharp

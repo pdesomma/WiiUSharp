@@ -1,10 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.2</Version>
+    <Version>0.8.0</Version>
     <Title>WiiUSharp</Title>
-    <Description>.NET library for Wii U title concepts: title IDs, product codes, regions, per-language names, and the image and boot-sound formats a title ships with.</Description>
-    <PackageReleaseNotes>0.7.0: version aligned; no changes.</PackageReleaseNotes>
+    <Description>.NET library for Wii U formats: title IDs, product codes, regions, per-language names, meta and app XML; NUS packages (pack, unpack, download, TMD, ticket, FST); NFS containers for Wii-mode titles; RPX/RPL executables.</Description>
+    <PackageReleaseNotes>0.8.0: WiiUSharp.Nfs, WiiUSharp.Nus and WiiUSharp.Rpx folded into this package; namespaces unchanged.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="WiiUSharp.Tests" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
 
 </Project>

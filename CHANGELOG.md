@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-15
+
+### Changed
+- `WiiUSharp.Nfs`, `WiiUSharp.Nus` and `WiiUSharp.Rpx` are part of the `WiiUSharp` package now; the namespaces are unchanged, so only package references move. The three old packages are retired at 0.7.2.
+
 ## [0.7.2] - 2026-09-15
 
 ### Fixed
