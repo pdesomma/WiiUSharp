@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-15
+
+### Added
+- `WiiUSharp.Wud`: `WudImage` opens a .wud, a .wux or a wudump `game_part1.wud...` series as one seekable stream (`WuxStream` for the compressed form); `WudDisc` reads the partition table and headers with the `DiscKey` (game.key) and pairs every game partition with the ticket, TMD and certificate chain the SI partition keeps; `WudTitle.WritePackage` writes a title as an installable package - the contents are copied as they sit on the disc, the H3 tables come out of the partition header and are checked against the TMD.
+- `Fst.Contents`: the FST's content table (offset in sectors, size, owner, hash mode).
+
 ## [0.8.0] - 2026-09-15
 
 ### Changed

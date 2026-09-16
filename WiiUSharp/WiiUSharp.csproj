@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <Title>WiiUSharp</Title>
-    <Description>.NET library for Wii U formats: title IDs, product codes, regions, per-language names, meta and app XML; NUS packages (pack, unpack, download, TMD, ticket, FST); NFS containers for Wii-mode titles; RPX/RPL executables.</Description>
-    <PackageReleaseNotes>0.8.0: WiiUSharp.Nfs, WiiUSharp.Nus and WiiUSharp.Rpx folded into this package; namespaces unchanged.</PackageReleaseNotes>
+    <Description>.NET library for Wii U formats: title IDs, product codes, regions, per-language names, meta and app XML; NUS packages (pack, unpack, download, TMD, ticket, FST); NFS containers for Wii-mode titles; RPX/RPL executables; WUD/WUX disc dumps read with their disc key and written out as installable packages.</Description>
+    <PackageReleaseNotes>0.9.0: WiiUSharp.Wud reads .wud/.wux dumps (split parts too) and writes each game title as an installable package, contents copied as they sit on the disc.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

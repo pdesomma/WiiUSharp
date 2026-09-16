@@ -12,7 +12,7 @@ No keys ship with these packages. The common key, title keys and `htk.bin` are y
 
 | Package | Targets | Purpose |
 |---|---|---|
-| `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation (`TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, `ImageSlot` / `BootSound` formats, meta and app XML); `WiiUSharp.Nus`: pack a `code`/`content`/`meta` folder into an installable title (FST, hashed and plain contents, fake-signed TMD and ticket), download a title from the update server, unpack it back; `WiiUSharp.Nfs`: the vWii disc container (`content/hif_*.nfs`); `WiiUSharp.Rpx`: RPX/RPL executables with sections plain, replaceable and re-compressed. No dependencies. |
+| `WiiUSharp` | net48, net6.0, net8.0, net10.0 | Title identity and presentation (`TitleId`, `GroupId`, `ProductCode`, `Region`, `Language`, per-language names, `ImageSlot` / `BootSound` formats, meta and app XML); `WiiUSharp.Nus`: pack a `code`/`content`/`meta` folder into an installable title (FST, hashed and plain contents, fake-signed TMD and ticket), download a title from the update server, unpack it back; `WiiUSharp.Nfs`: the vWii disc container (`content/hif_*.nfs`); `WiiUSharp.Rpx`: RPX/RPL executables with sections plain, replaceable and re-compressed; `WiiUSharp.Wud`: .wud/.wux disc dumps opened with their game.key, each game title written out as an installable package. No dependencies. |
 | `WiiUSharp.Imaging` | net48, net6.0, net8.0, net10.0 | Turns PNG, JPEG, BMP, WebP or TGA into the exact TGA an `ImageSlot` needs. SkiaSharp + TargaSharp; no System.Drawing. |
 | `WiiUSharp.Audio` | net48, net6.0, net8.0, net10.0 | Turns WAV, MP3 or AIFF into `bootSound.btsnd`: 48 kHz stereo 16-bit, six seconds. NAudio.Core + NLayer; no Windows codecs. |
 
@@ -45,6 +45,13 @@ var game = new Game(
 
 string id = game.TitleId.ToString();            // "0005000212345678"
 ImageSlot icon = ImageSlot.Icon;                // iconTex.tga, 128x128, 32 bpp
+
+using WiiUSharp.Wud;
+
+using Stream image = WudImage.Open("game.wux");               // .wud, .wux or game_part1.wud...
+WudDisc disc = WudDisc.Read(image, DiscKey.Beside("game.wux")!.Value);
+foreach (WudTitle title in disc.Titles)                      // the game, plus any update or DLC on the disc
+    title.WritePackage(image, commonKey, $"install/{title.TitleId}");   // title.tmd, title.tik, title.cert, *.app, *.h3
 ```
 
 ### Title images

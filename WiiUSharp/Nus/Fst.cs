@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace WiiUSharp.Nus;
 
@@ -17,16 +17,20 @@ public sealed class Fst
     private const int HeaderSize = 0x20;
     private static readonly byte[] Magic = { 0x46, 0x53, 0x54, 0x00 };
 
-    private Fst(int contentCount, IReadOnlyList<FstFile> files)
+    private Fst(IReadOnlyList<FstContent> contents, IReadOnlyList<FstFile> files)
     {
-        ContentCount = contentCount;
+        Contents = contents;
         Files = files;
     }
 
     /// <summary>
-    /// Contents the table describes, the FST itself included.
+    /// Number of contents the table spans.
     /// </summary>
-    public int ContentCount { get; }
+    public int ContentCount => Contents.Count;
+    /// <summary>
+    /// The content table: one entry per content, in index order.
+    /// </summary>
+    public IReadOnlyList<FstContent> Contents { get; }
     /// <summary>
     /// Every file, in table order.
     /// </summary>
@@ -60,6 +64,13 @@ public sealed class Fst
         if (HeaderSize + (long)contentCount * ContentHeaderSize + EntrySize > bytes.Length)
             throw new InvalidDataException("FST declares more contents than it holds.");
 
+        var contents = new List<FstContent>();
+        for (var i = 0; i < contentCount; i++)
+        {
+            var at = HeaderSize + i * ContentHeaderSize;
+            contents.Add(new FstContent(i, BigEndian.ReadUInt32(bytes, at), BigEndian.ReadUInt32(bytes, at + 0x04), BigEndian.ReadUInt64(bytes, at + 0x08), BigEndian.ReadUInt32(bytes, at + 0x10), bytes[at + 0x14]));
+        }
+
         var entriesAt = HeaderSize + (int)contentCount * ContentHeaderSize;
         var entryCount = BigEndian.ReadUInt32(bytes, entriesAt + 0x08);
         if (entryCount < 1 || entriesAt + (long)entryCount * EntrySize > bytes.Length)
@@ -89,7 +100,7 @@ public sealed class Fst
                 offset <<= 5;
             files.Add(new FstFile(path, BigEndian.ReadUInt16(bytes, at + 0x0E), offset, BigEndian.ReadUInt32(bytes, at + 0x08), flags));
         }
-        return new Fst((int)contentCount, files);
+        return new Fst(contents, files);
     }
 
     private static string Name(byte[] bytes, int offset)
